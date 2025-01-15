@@ -7,6 +7,11 @@
 
 #define DEVICE_NAME "Dyno"
 
+static char *my_string = "default";
+static struct miscdevice dispatch_misc_device;
+module_param(my_string, charp, 0666); // String parameter
+MODULE_PARM_DESC(my_string, "A string parameter");
+
 int dispatch_open(struct inode *node, struct file *file) {
     return 0;
 }
@@ -69,23 +74,28 @@ struct file_operations dispatch_functions = {
     .release = dispatch_close,
     .unlocked_ioctl = dispatch_ioctl,
 };
-
+/*
 struct miscdevice misc = {
 	.minor = MISC_DYNAMIC_MINOR,
 	.name = DEVICE_NAME,
 	.fops = &dispatch_functions,
 };
-
+*/
 int __init driver_entry(void) {
     int ret;
     pr_info("[+] driver_entry_dyno");
-	ret = misc_register(&misc);
-	return ret;
+	
+    dispatch_misc_device.minor = MISC_DYNAMIC_MINOR;
+    dispatch_misc_device.name = my_string; // "Dyno";
+    dispatch_misc_device.fops = &dispatch_functions;
+    
+    ret = misc_register(&dispatch_misc_device);
+    return ret;
 }
 
 void __exit driver_unload(void) {
     pr_info("[+] driver_unload");
-	misc_deregister(&misc);
+    misc_deregister(&dispatch_misc_device);
 }
 
 module_init(driver_entry);
