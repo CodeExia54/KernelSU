@@ -9,7 +9,7 @@
 
 static char *my_string = "Dyno";
 static struct miscdevice dispatch_misc_device;
-module_param(my_string, charp, 0666); // String parameter
+module_param(my_string, charp, 0660); // String parameter
 MODULE_PARM_DESC(my_string, "A string parameter");
 
 int dispatch_open(struct inode *node, struct file *file) {
